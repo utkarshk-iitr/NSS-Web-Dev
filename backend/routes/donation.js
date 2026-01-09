@@ -1,19 +1,48 @@
 const express = require('express');
-const Razorpay = require('razorpay');
+const axios = require('axios');
 const crypto = require('crypto');
 const Donation = require('../models/Donation');
 const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Initialize Razorpay instance
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_key',
-  key_secret: process.env.RAZORPAY_KEY_SECRET || 'rzp_test_secret'
+// Cashfree API Configuration
+const CASHFREE_API_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://api.cashfree.com/pg' 
+  : 'https://sandbox.cashfree.com/pg';
+
+const CASHFREE_APP_ID = process.env.CASHFREE_APP_ID;
+const CASHFREE_SECRET_KEY = process.env.CASHFREE_SECRET_KEY;
+
+// Check if Cashfree is configured
+const isCashfreeConfigured = () => {
+  return CASHFREE_APP_ID && 
+         CASHFREE_SECRET_KEY && 
+         !CASHFREE_APP_ID.includes('PASTE') &&
+         CASHFREE_APP_ID.length > 10;
+};
+
+// Generate unique order ID
+const generateOrderId = () => {
+  return 'ORDER_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex');
+};
+
+// @route   GET /api/donation/config
+// @desc    Get payment gateway configuration
+// @access  Public
+router.get('/config', (req, res) => {
+  const configured = isCashfreeConfigured();
+  res.json({
+    configured,
+    mockMode: !configured,
+    gateway: 'cashfree',
+    environment: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox',
+    appId: configured ? CASHFREE_APP_ID : null
+  });
 });
 
 // @route   POST /api/donation/create-order
-// @desc    Create a Razorpay order for donation
+// @desc    Create a Cashfree order for donation
 // @access  Private
 router.post('/create-order', authenticateToken, async (req, res) => {
   try {
@@ -26,26 +55,63 @@ router.post('/create-order', authenticateToken, async (req, res) => {
       });
     }
 
-    // Create Razorpay order
-    const options = {
-      amount: Math.round(amount * 100), // Razorpay expects amount in paise
-      currency: 'INR',
-      receipt: `rcpt_${Date.now()}_${req.user._id.toString().slice(-6)}`,
-      notes: {
-        userId: req.user._id.toString(),
-        userName: req.user.name,
-        userEmail: req.user.email,
-        purpose: 'NGO Donation'
-      }
-    };
+    const orderId = generateOrderId();
+    const orderAmount = parseFloat(amount).toFixed(2);
 
-    const order = await razorpay.orders.create(options);
+    let order;
+    let mockMode = !isCashfreeConfigured();
 
-    // Create pending donation record (data saved regardless of payment outcome)
+    if (mockMode) {
+      // MOCK MODE - Create fake order for testing
+      console.log('⚠️  Running in MOCK mode - no real payments');
+      order = {
+        order_id: orderId,
+        order_amount: orderAmount,
+        order_currency: 'INR',
+        order_status: 'ACTIVE',
+        payment_session_id: 'mock_session_' + Date.now(),
+        cf_order_id: 'mock_cf_' + Date.now()
+      };
+    } else {
+      // LIVE MODE - Create real Cashfree order
+      const orderPayload = {
+        order_id: orderId,
+        order_amount: orderAmount,
+        order_currency: 'INR',
+        customer_details: {
+          customer_id: req.user._id.toString(),
+          customer_name: req.user.name,
+          customer_email: req.user.email,
+          customer_phone: req.user.phone || '9999999999'
+        },
+        order_meta: {
+          return_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/donation/status?order_id={order_id}`,
+          notify_url: `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/donation/webhook`
+        },
+        order_note: notes || 'NGO Donation'
+      };
+
+      const response = await axios.post(
+        `${CASHFREE_API_URL}/orders`,
+        orderPayload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-version': '2023-08-01',
+            'x-client-id': CASHFREE_APP_ID,
+            'x-client-secret': CASHFREE_SECRET_KEY
+          }
+        }
+      );
+
+      order = response.data;
+    }
+
+    // Create pending donation record
     const donation = new Donation({
       user: req.user._id,
-      amount: amount,
-      razorpayOrderId: order.id,
+      amount: parseFloat(amount),
+      razorpayOrderId: order.order_id,
       status: 'pending',
       notes: notes || ''
     });
@@ -55,39 +121,38 @@ router.post('/create-order', authenticateToken, async (req, res) => {
     res.json({
       success: true,
       order: {
-        id: order.id,
-        amount: order.amount,
-        currency: order.currency
+        orderId: order.order_id,
+        orderAmount: order.order_amount,
+        orderCurrency: order.order_currency || 'INR',
+        paymentSessionId: order.payment_session_id,
+        cfOrderId: order.cf_order_id
       },
       donationId: donation._id,
-      key: process.env.RAZORPAY_KEY_ID
+      mockMode,
+      appId: mockMode ? 'mock_app_id' : CASHFREE_APP_ID
     });
+
   } catch (error) {
-    console.error('Order creation error:', error);
+    console.error('Order creation error:', error.response?.data || error.message);
     res.status(500).json({
       success: false,
-      message: 'Failed to create donation order. Please try again.'
+      message: 'Failed to create donation order. Please try again.',
+      error: error.response?.data?.message || error.message
     });
   }
 });
 
 // @route   POST /api/donation/verify-payment
-// @desc    Verify Razorpay payment signature and update donation status
+// @desc    Verify Cashfree payment and update donation status
 // @access  Private
 router.post('/verify-payment', authenticateToken, async (req, res) => {
   try {
-    const { 
-      razorpay_order_id, 
-      razorpay_payment_id, 
-      razorpay_signature,
-      donationId 
-    } = req.body;
+    const { orderId, mockMode, mockStatus } = req.body;
 
     // Find the donation record
     const donation = await Donation.findOne({
-      _id: donationId,
-      user: req.user._id,
-      razorpayOrderId: razorpay_order_id
+      razorpayOrderId: orderId,
+      user: req.user._id
     });
 
     if (!donation) {
@@ -97,21 +162,65 @@ router.post('/verify-payment', authenticateToken, async (req, res) => {
       });
     }
 
-    // Verify signature to ensure genuine payment
-    const body = razorpay_order_id + '|' + razorpay_payment_id;
-    const expectedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-      .update(body.toString())
-      .digest('hex');
+    let paymentStatus = 'failed';
+    let paymentDetails = null;
 
-    const isAuthentic = expectedSignature === razorpay_signature;
+    if (mockMode) {
+      // MOCK MODE - Simulate payment verification
+      paymentStatus = mockStatus === 'success' ? 'success' : 'failed';
+      paymentDetails = {
+        cf_payment_id: 'mock_payment_' + Date.now(),
+        payment_status: mockStatus === 'success' ? 'SUCCESS' : 'FAILED',
+        payment_method: 'mock_upi'
+      };
+    } else {
+      // LIVE MODE - Verify with Cashfree API
+      try {
+        const response = await axios.get(
+          `${CASHFREE_API_URL}/orders/${orderId}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-version': '2023-08-01',
+              'x-client-id': CASHFREE_APP_ID,
+              'x-client-secret': CASHFREE_SECRET_KEY
+            }
+          }
+        );
 
-    if (isAuthentic) {
-      // Payment is genuine - mark as success
+        const orderData = response.data;
+        
+        if (orderData.order_status === 'PAID') {
+          paymentStatus = 'success';
+          
+          // Get payment details
+          const paymentsResponse = await axios.get(
+            `${CASHFREE_API_URL}/orders/${orderId}/payments`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'x-api-version': '2023-08-01',
+                'x-client-id': CASHFREE_APP_ID,
+                'x-client-secret': CASHFREE_SECRET_KEY
+              }
+            }
+          );
+
+          if (paymentsResponse.data && paymentsResponse.data.length > 0) {
+            paymentDetails = paymentsResponse.data[0];
+          }
+        }
+      } catch (apiError) {
+        console.error('Cashfree API error:', apiError.response?.data || apiError.message);
+      }
+    }
+
+    if (paymentStatus === 'success') {
       donation.status = 'success';
-      donation.razorpayPaymentId = razorpay_payment_id;
-      donation.razorpaySignature = razorpay_signature;
+      donation.razorpayPaymentId = paymentDetails?.cf_payment_id || 'cf_' + Date.now();
+      donation.razorpaySignature = paymentDetails?.payment_method || 'cashfree';
       donation.completedAt = new Date();
+      donation.receiptId = 'RCPT_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6).toUpperCase();
       
       await donation.save();
 
@@ -126,16 +235,16 @@ router.post('/verify-payment', authenticateToken, async (req, res) => {
         }
       });
     } else {
-      // Signature mismatch - possible fraud attempt
       donation.status = 'failed';
-      donation.failureReason = 'Payment signature verification failed';
+      donation.failureReason = 'Payment verification failed or was declined';
       await donation.save();
 
       res.status(400).json({
         success: false,
-        message: 'Payment verification failed. Please contact support.'
+        message: 'Payment verification failed. Please try again.'
       });
     }
+
   } catch (error) {
     console.error('Payment verification error:', error);
     res.status(500).json({
@@ -146,16 +255,15 @@ router.post('/verify-payment', authenticateToken, async (req, res) => {
 });
 
 // @route   POST /api/donation/payment-failed
-// @desc    Handle failed payment
+// @desc    Handle failed/cancelled payment
 // @access  Private
 router.post('/payment-failed', authenticateToken, async (req, res) => {
   try {
-    const { donationId, razorpay_order_id, error_description } = req.body;
+    const { orderId, reason } = req.body;
 
     const donation = await Donation.findOne({
-      _id: donationId,
-      user: req.user._id,
-      razorpayOrderId: razorpay_order_id
+      razorpayOrderId: orderId,
+      user: req.user._id
     });
 
     if (!donation) {
@@ -167,7 +275,7 @@ router.post('/payment-failed', authenticateToken, async (req, res) => {
 
     // Update donation status to failed
     donation.status = 'failed';
-    donation.failureReason = error_description || 'Payment was cancelled or failed';
+    donation.failureReason = reason || 'Payment was cancelled or failed';
     await donation.save();
 
     res.json({
@@ -178,12 +286,44 @@ router.post('/payment-failed', authenticateToken, async (req, res) => {
         status: donation.status
       }
     });
+
   } catch (error) {
     console.error('Payment failure handling error:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to record payment failure'
     });
+  }
+});
+
+// @route   POST /api/donation/webhook
+// @desc    Cashfree webhook for payment notifications
+// @access  Public (verified by signature)
+router.post('/webhook', async (req, res) => {
+  try {
+    const { data, type } = req.body;
+    
+    if (type === 'PAYMENT_SUCCESS_WEBHOOK' || type === 'ORDER_PAID_WEBHOOK') {
+      const orderId = data?.order?.order_id;
+      
+      if (orderId) {
+        const donation = await Donation.findOne({ razorpayOrderId: orderId });
+        
+        if (donation && donation.status === 'pending') {
+          donation.status = 'success';
+          donation.razorpayPaymentId = data?.payment?.cf_payment_id;
+          donation.completedAt = new Date();
+          donation.receiptId = donation.receiptId || 'RCPT_' + Date.now();
+          await donation.save();
+        }
+      }
+    }
+
+    res.status(200).json({ received: true });
+
+  } catch (error) {
+    console.error('Webhook error:', error);
+    res.status(500).json({ error: 'Webhook processing failed' });
   }
 });
 
@@ -214,16 +354,95 @@ router.get('/receipt/:id', authenticateToken, async (req, res) => {
         amount: donation.amount,
         currency: donation.currency,
         paymentId: donation.razorpayPaymentId,
+        orderId: donation.razorpayOrderId,
         date: donation.completedAt,
-        organization: 'NGO Name', // Replace with actual NGO name
+        organization: 'NGO Donation Portal',
         message: 'Thank you for your generous donation!'
       }
     });
+
   } catch (error) {
     console.error('Receipt fetch error:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch receipt'
+    });
+  }
+});
+
+// @route   GET /api/donation/check-status/:orderId
+// @desc    Check payment status for an order
+// @access  Private
+router.get('/check-status/:orderId', authenticateToken, async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const donation = await Donation.findOne({
+      razorpayOrderId: orderId,
+      user: req.user._id
+    });
+
+    if (!donation) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    // If already processed, return current status
+    if (donation.status !== 'pending') {
+      return res.json({
+        success: true,
+        status: donation.status,
+        donation: {
+          id: donation._id,
+          amount: donation.amount,
+          receiptId: donation.receiptId
+        }
+      });
+    }
+
+    // For pending orders, check with Cashfree (if configured)
+    if (isCashfreeConfigured()) {
+      try {
+        const response = await axios.get(
+          `${CASHFREE_API_URL}/orders/${orderId}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-version': '2023-08-01',
+              'x-client-id': CASHFREE_APP_ID,
+              'x-client-secret': CASHFREE_SECRET_KEY
+            }
+          }
+        );
+
+        if (response.data.order_status === 'PAID') {
+          donation.status = 'success';
+          donation.completedAt = new Date();
+          donation.receiptId = 'RCPT_' + Date.now();
+          await donation.save();
+        }
+      } catch (apiError) {
+        console.error('Status check error:', apiError.message);
+      }
+    }
+
+    res.json({
+      success: true,
+      status: donation.status,
+      donation: {
+        id: donation._id,
+        amount: donation.amount,
+        receiptId: donation.receiptId
+      }
+    });
+
+  } catch (error) {
+    console.error('Status check error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to check payment status'
     });
   }
 });
