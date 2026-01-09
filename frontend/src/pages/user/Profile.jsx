@@ -3,7 +3,7 @@ import UserLayout from '../../components/layouts/UserLayout';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
 import { formatDate } from '../../utils/helpers';
-import { FiUser, FiMail, FiPhone, FiMapPin, FiSave } from 'react-icons/fi';
+import { FiSave } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 const Profile = () => {
@@ -99,17 +99,14 @@ const Profile = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Full Name
                 </label>
-                <div className="relative">
-                  <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="input-field pl-11"
-                    placeholder="Your name"
-                  />
-                </div>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="input-field"
+                  placeholder="Your name"
+                />
               </div>
 
               {/* Email (Read Only) */}
@@ -117,15 +114,12 @@ const Profile = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email Address
                 </label>
-                <div className="relative">
-                  <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="email"
-                    value={user?.email || ''}
-                    disabled
-                    className="input-field pl-11 bg-gray-50 cursor-not-allowed"
-                  />
-                </div>
+                <input
+                  type="email"
+                  value={user?.email || ''}
+                  disabled
+                  className="input-field bg-gray-50 cursor-not-allowed"
+                />
                 <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
               </div>
 
@@ -134,17 +128,14 @@ const Profile = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Phone Number
                 </label>
-                <div className="relative">
-                  <FiPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="input-field pl-11"
-                    placeholder="+91 9876543210"
-                  />
-                </div>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="input-field"
+                  placeholder="+91 9876543210"
+                />
               </div>
 
               {/* Street */}
@@ -152,17 +143,14 @@ const Profile = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Street Address
                 </label>
-                <div className="relative">
-                  <FiMapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    name="address.street"
-                    value={formData.address.street}
-                    onChange={handleChange}
-                    className="input-field pl-11"
-                    placeholder="123 Main Street"
-                  />
-                </div>
+                <input
+                  type="text"
+                  name="address.street"
+                  value={formData.address.street}
+                  onChange={handleChange}
+                  className="input-field"
+                  placeholder="123 Main Street"
+                />
               </div>
 
               {/* City */}

@@ -13,7 +13,8 @@ import {
   FiPhone,
   FiToggleLeft,
   FiToggleRight,
-  FiX
+  FiX,
+  FiTrash2
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
@@ -29,6 +30,8 @@ const Users = () => {
   });
   const [showFilters, setShowFilters] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -39,10 +42,13 @@ const Users = () => {
       setLoading(true);
       const params = { 
         page: pagination.current, 
-        limit: 10,
-        ...filters
+        limit: 10
       };
+      // Only add non-empty filters
       if (search) params.search = search;
+      if (filters.isActive) params.isActive = filters.isActive;
+      if (filters.startDate) params.startDate = filters.startDate;
+      if (filters.endDate) params.endDate = filters.endDate;
       
       const response = await api.get('/admin/users', { params });
       setUsers(response.data.users);
@@ -70,6 +76,29 @@ const Users = () => {
       }
     } catch (error) {
       toast.error('Failed to update status');
+    }
+  };
+
+  const handleDeleteUser = async (userId, userName) => {
+    setDeleteConfirm({ userId, userName });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirm) return;
+    
+    setDeleting(true);
+    try {
+      await api.delete(`/admin/users/${deleteConfirm.userId}`);
+      toast.success('User deleted successfully');
+      fetchUsers();
+      if (selectedUser?._id === deleteConfirm.userId) {
+        setSelectedUser(null);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete user');
+    } finally {
+      setDeleting(false);
+      setDeleteConfirm(null);
     }
   };
 
@@ -113,16 +142,13 @@ const Users = () => {
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <form onSubmit={handleSearch} className="flex-1 flex gap-2">
-              <div className="relative flex-1">
-                <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search by name, email, or phone..."
-                  className="input-field pl-11"
-                />
-              </div>
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by name, email, or phone..."
+                className="input-field flex-1"
+              />
               <button type="submit" className="btn-primary">
                 Search
               </button>
@@ -199,6 +225,7 @@ const Users = () => {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Donations</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Registered</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
@@ -226,6 +253,16 @@ const Users = () => {
                         <td className="px-6 py-4 text-sm text-gray-500">
                           {user.address?.city ? `${user.address.city}, ${user.address.state}` : '-'}
                         </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm">
+                            <span className="text-green-600 font-medium">
+                              ₹{(user.totalDonations || 0).toLocaleString()}
+                            </span>
+                            <p className="text-xs text-gray-400">
+                              {user.donationCount || 0} donation{(user.donationCount || 0) !== 1 ? 's' : ''}
+                            </p>
+                          </div>
+                        </td>
                         <td className="px-6 py-4 text-sm text-gray-500">
                           {formatDate(user.createdAt)}
                         </td>
@@ -235,18 +272,18 @@ const Users = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => viewUserDetails(user._id)}
-                              className="text-primary-600 hover:text-primary-700 text-sm font-medium"
-                            >
-                              View
-                            </button>
+                          <div className="flex items-center space-x-3">
                             <button
                               onClick={() => handleToggleStatus(user._id)}
-                              className={`${user.isActive ? 'text-red-600 hover:text-red-700' : 'text-green-600 hover:text-green-700'} text-sm font-medium`}
+                              className={`${user.isActive ? 'text-orange-600 hover:text-orange-700' : 'text-green-600 hover:text-green-700'} text-sm font-medium`}
                             >
                               {user.isActive ? 'Deactivate' : 'Activate'}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteUser(user._id, user.name)}
+                              className="text-red-600 hover:text-red-700 text-sm font-medium"
+                            >
+                              Delete
                             </button>
                           </div>
                         </td>
@@ -366,6 +403,46 @@ const Users = () => {
                       </div>
                     ))}
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {deleteConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl max-w-md w-full p-6 animate-fadeIn">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FiTrash2 className="text-red-600 text-2xl" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete User</h3>
+                <p className="text-gray-500 mb-2">
+                  Are you sure you want to delete <span className="font-medium text-gray-900">"{deleteConfirm.userName}"</span>?
+                </p>
+                <p className="text-sm text-red-500 mb-6">
+                  This will permanently delete the user and all their donation records. This action cannot be undone.
+                </p>
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => setDeleteConfirm(null)}
+                    disabled={deleting}
+                    className="flex-1 btn-secondary py-2.5"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDelete}
+                    disabled={deleting}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center"
+                  >
+                    {deleting ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      'Delete User'
+                    )}
+                  </button>
                 </div>
               </div>
             </div>

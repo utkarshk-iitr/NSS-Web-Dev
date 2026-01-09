@@ -147,7 +147,7 @@ router.get('/users', async (req, res) => {
     }
 
     // Active status filter
-    if (isActive !== undefined) {
+    if (isActive !== undefined && isActive !== '') {
       query.isActive = isActive === 'true';
     }
 
@@ -164,13 +164,42 @@ router.get('/users', async (req, res) => {
       .select('-password')
       .sort(sort)
       .skip((page - 1) * limit)
-      .limit(parseInt(limit));
+      .limit(parseInt(limit))
+      .lean();
+
+    // Get donation stats for each user
+    const userIds = users.map(u => u._id);
+    const donationStats = await Donation.aggregate([
+      { $match: { user: { $in: userIds }, status: 'success' } },
+      { 
+        $group: { 
+          _id: '$user', 
+          totalDonations: { $sum: '$amount' },
+          donationCount: { $sum: 1 }
+        } 
+      }
+    ]);
+
+    // Merge donation stats with users
+    const donationMap = {};
+    donationStats.forEach(stat => {
+      donationMap[stat._id.toString()] = {
+        totalDonations: stat.totalDonations,
+        donationCount: stat.donationCount
+      };
+    });
+
+    const usersWithStats = users.map(user => ({
+      ...user,
+      totalDonations: donationMap[user._id.toString()]?.totalDonations || 0,
+      donationCount: donationMap[user._id.toString()]?.donationCount || 0
+    }));
 
     const total = await User.countDocuments(query);
 
     res.json({
       success: true,
-      users,
+      users: usersWithStats,
       pagination: {
         current: parseInt(page),
         pages: Math.ceil(total / limit),
@@ -256,6 +285,47 @@ router.put('/users/:id/status', async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: 'Failed to update user status' 
+    });
+  }
+});
+
+// @route   DELETE /api/admin/users/:id
+// @desc    Delete a user and their donations
+// @access  Private (Admin)
+router.delete('/users/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'User not found' 
+      });
+    }
+
+    // Don't allow deleting admin users
+    if (user.role === 'admin') {
+      return res.status(403).json({ 
+        success: false, 
+        message: 'Cannot delete admin users' 
+      });
+    }
+
+    // Delete user's donations
+    await Donation.deleteMany({ user: user._id });
+    
+    // Delete the user
+    await User.findByIdAndDelete(req.params.id);
+
+    res.json({
+      success: true,
+      message: 'User and their donation records deleted successfully'
+    });
+  } catch (error) {
+    console.error('User delete error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to delete user' 
     });
   }
 });

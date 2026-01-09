@@ -253,19 +253,16 @@ const MakeDonation = () => {
           {/* Custom Amount */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Or Enter Custom Amount
+              Or Enter Custom Amount (₹)
             </label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
-              <input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="Enter amount"
-                min="1"
-                className="input-field pl-8 text-lg"
-              />
-            </div>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="Enter amount in rupees"
+              min="1"
+              className="input-field text-lg"
+            />
           </div>
 
           {/* Notes */}

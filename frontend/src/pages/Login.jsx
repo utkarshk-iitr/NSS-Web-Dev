@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiMail, FiLock, FiHeart, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiHeart, FiEye, FiEyeOff } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 const Login = () => {
@@ -62,18 +62,15 @@ const Login = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email Address
               </label>
-              <div className="relative">
-                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="input-field pl-11"
-                  placeholder="Enter your email"
-                />
-              </div>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="input-field"
+                placeholder="Enter your email"
+              />
             </div>
 
             <div>
@@ -81,14 +78,13 @@ const Login = () => {
                 Password
               </label>
               <div className="relative">
-                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="input-field pl-11 pr-11"
+                  className="input-field pr-11"
                   placeholder="Enter your password"
                 />
                 <button
