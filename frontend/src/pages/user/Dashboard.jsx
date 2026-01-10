@@ -42,62 +42,62 @@ const Dashboard = () => {
       <div className="animate-fadeIn">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Welcome back, {user?.name?.split(' ')[0]}! 👋
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
             Here's an overview of your donation activity
           </p>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6 card-hover">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 card-hover">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Total Donated</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Donated</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatCurrency(stats.totalAmountDonated)}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <FiDollarSign className="text-green-600 text-xl" />
+              <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                <FiDollarSign className="text-green-600 dark:text-green-400 text-xl" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6 card-hover">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 card-hover">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Successful</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.successfulDonations}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Successful</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.successfulDonations}</p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <FiCheckCircle className="text-blue-600 text-xl" />
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                <FiCheckCircle className="text-blue-600 dark:text-blue-400 text-xl" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6 card-hover">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 card-hover">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Pending</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.pendingDonations}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Pending</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.pendingDonations}</p>
               </div>
-              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <FiClock className="text-yellow-600 text-xl" />
+              <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
+                <FiClock className="text-yellow-600 dark:text-yellow-400 text-xl" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6 card-hover">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 card-hover">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Failed</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.failedDonations}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Failed</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.failedDonations}</p>
               </div>
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                <FiXCircle className="text-red-600 text-xl" />
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+                <FiXCircle className="text-red-600 dark:text-red-400 text-xl" />
               </div>
             </div>
           </div>
@@ -121,10 +121,10 @@ const Dashboard = () => {
           </div>
 
           {/* Recent Donations */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
+          <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Recent Donations</h3>
-              <Link to="/donations" className="text-primary-600 hover:text-primary-700 text-sm font-medium flex items-center space-x-1">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Donations</h3>
+              <Link to="/donations" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 text-sm font-medium flex items-center space-x-1">
                 <span>View All</span>
                 <FiArrowRight size={14} />
               </Link>
@@ -133,19 +133,19 @@ const Dashboard = () => {
             {recentDonations && recentDonations.length > 0 ? (
               <div className="space-y-4">
                 {recentDonations.map((donation) => (
-                  <div key={donation._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div key={donation._id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <div className="flex items-center space-x-4">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        donation.status === 'success' ? 'bg-green-100' :
-                        donation.status === 'pending' ? 'bg-yellow-100' : 'bg-red-100'
+                        donation.status === 'success' ? 'bg-green-100 dark:bg-green-900/30' :
+                        donation.status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900/30' : 'bg-red-100 dark:bg-red-900/30'
                       }`}>
-                        {donation.status === 'success' ? <FiCheckCircle className="text-green-600" /> :
-                         donation.status === 'pending' ? <FiClock className="text-yellow-600" /> :
-                         <FiXCircle className="text-red-600" />}
+                        {donation.status === 'success' ? <FiCheckCircle className="text-green-600 dark:text-green-400" /> :
+                         donation.status === 'pending' ? <FiClock className="text-yellow-600 dark:text-yellow-400" /> :
+                         <FiXCircle className="text-red-600 dark:text-red-400" />}
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">{formatCurrency(donation.amount)}</p>
-                        <p className="text-sm text-gray-500">{formatDate(donation.createdAt)}</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{formatCurrency(donation.amount)}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(donation.createdAt)}</p>
                       </div>
                     </div>
                     <span className={`badge ${getStatusColor(donation.status)}`}>
@@ -156,9 +156,9 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="text-center py-8">
-                <FiHeart className="mx-auto text-4xl text-gray-300 mb-3" />
-                <p className="text-gray-500">No donations yet</p>
-                <Link to="/donate" className="text-primary-600 hover:text-primary-700 font-medium mt-2 inline-block">
+                <FiHeart className="mx-auto text-4xl text-gray-300 dark:text-gray-600 mb-3" />
+                <p className="text-gray-500 dark:text-gray-400">No donations yet</p>
+                <Link to="/donate" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium mt-2 inline-block">
                   Make your first donation
                 </Link>
               </div>
@@ -167,24 +167,24 @@ const Dashboard = () => {
         </div>
 
         {/* Registration Info */}
-        <div className="mt-6 bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Registration Details</h3>
+        <div className="mt-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Your Registration Details</h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <p className="text-sm text-gray-500">Name</p>
-              <p className="font-medium text-gray-900">{user?.name}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Name</p>
+              <p className="font-medium text-gray-900 dark:text-white">{user?.name}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Email</p>
-              <p className="font-medium text-gray-900">{user?.email}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
+              <p className="font-medium text-gray-900 dark:text-white">{user?.email}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Phone</p>
-              <p className="font-medium text-gray-900">{user?.phone || 'Not provided'}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
+              <p className="font-medium text-gray-900 dark:text-white">{user?.phone || 'Not provided'}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Registered On</p>
-              <p className="font-medium text-gray-900">{formatDate(user?.registeredAt)}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Registered On</p>
+              <p className="font-medium text-gray-900 dark:text-white">{formatDate(user?.registeredAt)}</p>
             </div>
           </div>
         </div>

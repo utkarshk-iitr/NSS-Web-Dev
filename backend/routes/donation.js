@@ -218,7 +218,11 @@ router.post('/verify-payment', authenticateToken, async (req, res) => {
     if (paymentStatus === 'success') {
       donation.status = 'success';
       donation.razorpayPaymentId = paymentDetails?.cf_payment_id || 'cf_' + Date.now();
-      donation.razorpaySignature = paymentDetails?.payment_method || 'cashfree';
+      // Convert payment_method object to string
+      const paymentMethod = paymentDetails?.payment_method;
+      donation.razorpaySignature = typeof paymentMethod === 'object' 
+        ? JSON.stringify(paymentMethod) 
+        : (paymentMethod || 'cashfree');
       donation.completedAt = new Date();
       donation.receiptId = 'RCPT_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6).toUpperCase();
       

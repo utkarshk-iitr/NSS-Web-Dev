@@ -30,14 +30,17 @@ router.get('/profile', authenticateToken, async (req, res) => {
 // @desc    Update user profile
 // @access  Private (User)
 router.put('/profile', authenticateToken, [
-  body('name').optional().trim().isLength({ min: 2 }),
-  body('phone').optional().isMobilePhone(),
+  body('name').optional().trim().isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
+  body('phone').optional({ values: 'falsy' }).isMobilePhone().withMessage('Please enter a valid phone number'),
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      // Get the first error message
+      const errorMessages = errors.array().map(err => err.msg);
       return res.status(400).json({ 
         success: false, 
+        message: errorMessages[0],
         errors: errors.array() 
       });
     }

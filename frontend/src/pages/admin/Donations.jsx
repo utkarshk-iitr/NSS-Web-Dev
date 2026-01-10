@@ -96,8 +96,8 @@ const Donations = () => {
       <div className="animate-fadeIn">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Donation Management</h1>
-            <p className="text-gray-500 mt-1">Track and manage all donation records</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Donation Management</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">Track and manage all donation records</p>
           </div>
           <button
             onClick={handleExport}
@@ -110,43 +110,43 @@ const Donations = () => {
 
         {/* Stats Summary */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-lg p-4 shadow-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
             <div className="flex items-center space-x-2">
-              <FiDollarSign className="text-gray-400" />
-              <span className="text-sm text-gray-500">Total Amount</span>
+              <FiDollarSign className="text-gray-400 dark:text-gray-500" />
+              <span className="text-sm text-gray-500 dark:text-gray-400">Total Amount</span>
             </div>
-            <p className="text-xl font-bold text-gray-900 mt-1">
+            <p className="text-xl font-bold text-gray-900 dark:text-white mt-1">
               {formatCurrency(aggregatedStats.totalAmount)}
             </p>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
             <div className="flex items-center space-x-2">
-              <FiCheckCircle className="text-green-600" />
-              <span className="text-sm text-gray-500">Successful</span>
+              <FiCheckCircle className="text-green-600 dark:text-green-400" />
+              <span className="text-sm text-gray-500 dark:text-gray-400">Successful</span>
             </div>
-            <p className="text-xl font-bold text-green-600 mt-1">{aggregatedStats.success.count}</p>
+            <p className="text-xl font-bold text-green-600 dark:text-green-400 mt-1">{aggregatedStats.success.count}</p>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
             <div className="flex items-center space-x-2">
-              <FiClock className="text-yellow-600" />
-              <span className="text-sm text-gray-500">Pending</span>
+              <FiClock className="text-yellow-600 dark:text-yellow-400" />
+              <span className="text-sm text-gray-500 dark:text-gray-400">Pending</span>
             </div>
-            <p className="text-xl font-bold text-yellow-600 mt-1">{aggregatedStats.pending.count}</p>
+            <p className="text-xl font-bold text-yellow-600 dark:text-yellow-400 mt-1">{aggregatedStats.pending.count}</p>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
             <div className="flex items-center space-x-2">
-              <FiXCircle className="text-red-600" />
-              <span className="text-sm text-gray-500">Failed</span>
+              <FiXCircle className="text-red-600 dark:text-red-400" />
+              <span className="text-sm text-gray-500 dark:text-gray-400">Failed</span>
             </div>
-            <p className="text-xl font-bold text-red-600 mt-1">{aggregatedStats.failed.count}</p>
+            <p className="text-xl font-bold text-red-600 dark:text-red-400 mt-1">{aggregatedStats.failed.count}</p>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">Filter by status:</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">Filter by status:</span>
               {['', 'success', 'pending', 'failed'].map((status) => (
                 <button
                   key={status || 'all'}
@@ -157,7 +157,7 @@ const Donations = () => {
                   className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                     filters.status === status
                       ? 'bg-primary-600 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   {status ? status.charAt(0).toUpperCase() + status.slice(1) : 'All'}
@@ -175,9 +175,9 @@ const Donations = () => {
 
           {/* Extended Filters */}
           {showFilters && (
-            <div className="mt-4 pt-4 border-t grid md:grid-cols-5 gap-4">
+            <div className="mt-4 pt-4 border-t dark:border-gray-700 grid md:grid-cols-5 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">From Date</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">From Date</label>
                 <input
                   type="date"
                   value={filters.startDate}
@@ -186,7 +186,7 @@ const Donations = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">To Date</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">To Date</label>
                 <input
                   type="date"
                   value={filters.endDate}
@@ -195,7 +195,7 @@ const Donations = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Min Amount</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Min Amount</label>
                 <input
                   type="number"
                   value={filters.minAmount}
@@ -205,7 +205,7 @@ const Donations = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Max Amount</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Max Amount</label>
                 <input
                   type="number"
                   value={filters.maxAmount}
@@ -233,7 +233,7 @@ const Donations = () => {
         </div>
 
         {/* Donations Table */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center h-64">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600"></div>
@@ -242,27 +242,27 @@ const Donations = () => {
             <>
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-gray-50 dark:bg-gray-700">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Donor</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payment ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Donor</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Amount</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Payment ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                     {donations.map((donation) => (
-                      <tr key={donation._id} className="hover:bg-gray-50">
+                      <tr key={donation._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                         <td className="px-6 py-4">
                           <div>
-                            <p className="font-medium text-gray-900">{donation.user?.name || 'Unknown'}</p>
-                            <p className="text-sm text-gray-500">{donation.user?.email || '-'}</p>
+                            <p className="font-medium text-gray-900 dark:text-white">{donation.user?.name || 'Unknown'}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{donation.user?.email || '-'}</p>
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <p className="font-bold text-gray-900">{formatCurrency(donation.amount)}</p>
+                          <p className="font-bold text-gray-900 dark:text-white">{formatCurrency(donation.amount)}</p>
                         </td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center space-x-1 badge ${getStatusColor(donation.status)}`}>
@@ -270,16 +270,16 @@ const Donations = () => {
                             <span className="capitalize">{donation.status}</span>
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-500 font-mono">
+                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 font-mono">
                           {donation.razorpayPaymentId || '-'}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-500">
+                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                           {formatDateTime(donation.createdAt)}
                         </td>
                         <td className="px-6 py-4">
                           <button
                             onClick={() => viewDonationDetails(donation._id)}
-                            className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                            className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-sm font-medium"
                           >
                             View Details
                           </button>
@@ -292,22 +292,22 @@ const Donations = () => {
 
               {/* Pagination */}
               {pagination.pages > 1 && (
-                <div className="flex items-center justify-between px-6 py-4 border-t">
-                  <p className="text-sm text-gray-500">
+                <div className="flex items-center justify-between px-6 py-4 border-t dark:border-gray-700">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     Page {pagination.current} of {pagination.pages} ({pagination.total} total)
                   </p>
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setPagination(prev => ({ ...prev, current: prev.current - 1 }))}
                       disabled={pagination.current === 1}
-                      className="p-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                      className="p-2 rounded-lg border dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                     >
                       <FiChevronLeft />
                     </button>
                     <button
                       onClick={() => setPagination(prev => ({ ...prev, current: prev.current + 1 }))}
                       disabled={pagination.current === pagination.pages}
-                      className="p-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                      className="p-2 rounded-lg border dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                     >
                       <FiChevronRight />
                     </button>
@@ -317,8 +317,8 @@ const Donations = () => {
             </>
           ) : (
             <div className="text-center py-12">
-              <FiDollarSign className="mx-auto text-4xl text-gray-300 mb-3" />
-              <p className="text-gray-500">No donations found</p>
+              <FiDollarSign className="mx-auto text-4xl text-gray-300 dark:text-gray-600 mb-3" />
+              <p className="text-gray-500 dark:text-gray-400">No donations found</p>
             </div>
           )}
         </div>
@@ -326,19 +326,19 @@ const Donations = () => {
         {/* Donation Detail Modal */}
         {selectedDonation && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl max-w-lg w-full">
-              <div className="flex items-center justify-between p-6 border-b">
-                <h3 className="text-lg font-semibold text-gray-900">Donation Details</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-xl max-w-lg w-full">
+              <div className="flex items-center justify-between p-6 border-b dark:border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Donation Details</h3>
                 <button
                   onClick={() => setSelectedDonation(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                 >
                   <FiX size={24} />
                 </button>
               </div>
               <div className="p-6">
                 <div className="text-center mb-6">
-                  <p className="text-3xl font-bold text-gray-900">{formatCurrency(selectedDonation.amount)}</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-white">{formatCurrency(selectedDonation.amount)}</p>
                   <span className={`inline-flex items-center space-x-1 badge ${getStatusColor(selectedDonation.status)} mt-2`}>
                     {getStatusIcon(selectedDonation.status)}
                     <span className="capitalize">{selectedDonation.status}</span>
@@ -346,48 +346,48 @@ const Donations = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="flex justify-between py-2 border-b">
-                    <span className="text-gray-500">Donor Name</span>
-                    <span className="font-medium">{selectedDonation.user?.name}</span>
+                  <div className="flex justify-between py-2 border-b dark:border-gray-700">
+                    <span className="text-gray-500 dark:text-gray-400">Donor Name</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{selectedDonation.user?.name}</span>
                   </div>
-                  <div className="flex justify-between py-2 border-b">
-                    <span className="text-gray-500">Email</span>
-                    <span className="font-medium">{selectedDonation.user?.email}</span>
+                  <div className="flex justify-between py-2 border-b dark:border-gray-700">
+                    <span className="text-gray-500 dark:text-gray-400">Email</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{selectedDonation.user?.email}</span>
                   </div>
-                  <div className="flex justify-between py-2 border-b">
-                    <span className="text-gray-500">Phone</span>
-                    <span className="font-medium">{selectedDonation.user?.phone || '-'}</span>
+                  <div className="flex justify-between py-2 border-b dark:border-gray-700">
+                    <span className="text-gray-500 dark:text-gray-400">Phone</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{selectedDonation.user?.phone || '-'}</span>
                   </div>
-                  <div className="flex justify-between py-2 border-b">
-                    <span className="text-gray-500">Order ID</span>
-                    <span className="font-mono text-sm">{selectedDonation.razorpayOrderId}</span>
+                  <div className="flex justify-between py-2 border-b dark:border-gray-700">
+                    <span className="text-gray-500 dark:text-gray-400">Order ID</span>
+                    <span className="font-mono text-sm text-gray-900 dark:text-white">{selectedDonation.razorpayOrderId}</span>
                   </div>
                   {selectedDonation.razorpayPaymentId && (
-                    <div className="flex justify-between py-2 border-b">
-                      <span className="text-gray-500">Payment ID</span>
-                      <span className="font-mono text-sm">{selectedDonation.razorpayPaymentId}</span>
+                    <div className="flex justify-between py-2 border-b dark:border-gray-700">
+                      <span className="text-gray-500 dark:text-gray-400">Payment ID</span>
+                      <span className="font-mono text-sm text-gray-900 dark:text-white">{selectedDonation.razorpayPaymentId}</span>
                     </div>
                   )}
                   {selectedDonation.receiptId && (
-                    <div className="flex justify-between py-2 border-b">
-                      <span className="text-gray-500">Receipt ID</span>
-                      <span className="font-mono text-sm">{selectedDonation.receiptId}</span>
+                    <div className="flex justify-between py-2 border-b dark:border-gray-700">
+                      <span className="text-gray-500 dark:text-gray-400">Receipt ID</span>
+                      <span className="font-mono text-sm text-gray-900 dark:text-white">{selectedDonation.receiptId}</span>
                     </div>
                   )}
-                  <div className="flex justify-between py-2 border-b">
-                    <span className="text-gray-500">Attempted At</span>
-                    <span className="font-medium">{formatDateTime(selectedDonation.attemptedAt)}</span>
+                  <div className="flex justify-between py-2 border-b dark:border-gray-700">
+                    <span className="text-gray-500 dark:text-gray-400">Attempted At</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{formatDateTime(selectedDonation.attemptedAt)}</span>
                   </div>
                   {selectedDonation.completedAt && (
-                    <div className="flex justify-between py-2 border-b">
-                      <span className="text-gray-500">Completed At</span>
-                      <span className="font-medium">{formatDateTime(selectedDonation.completedAt)}</span>
+                    <div className="flex justify-between py-2 border-b dark:border-gray-700">
+                      <span className="text-gray-500 dark:text-gray-400">Completed At</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{formatDateTime(selectedDonation.completedAt)}</span>
                     </div>
                   )}
                   {selectedDonation.failureReason && (
                     <div className="py-2">
-                      <span className="text-gray-500 block mb-1">Failure Reason</span>
-                      <span className="text-red-600 text-sm">{selectedDonation.failureReason}</span>
+                      <span className="text-gray-500 dark:text-gray-400 block mb-1">Failure Reason</span>
+                      <span className="text-red-600 dark:text-red-400 text-sm">{selectedDonation.failureReason}</span>
                     </div>
                   )}
                 </div>

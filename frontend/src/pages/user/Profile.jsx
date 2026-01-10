@@ -57,7 +57,17 @@ const Profile = () => {
       updateUser(response.data.user);
       toast.success('Profile updated successfully!');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to update profile');
+      // Get detailed error message
+      let errorMessage = 'Failed to update profile';
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data?.errors && error.response.data.errors.length > 0) {
+        // Get validation errors
+        errorMessage = error.response.data.errors.map(err => err.msg || err.message).join(', ');
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -67,12 +77,12 @@ const Profile = () => {
     <UserLayout>
       <div className="max-w-3xl mx-auto animate-fadeIn">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
-          <p className="text-gray-500 mt-1">View and update your registration details</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Profile</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">View and update your registration details</p>
         </div>
 
         {/* Profile Card */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-primary-600 to-blue-600 p-6">
             <div className="flex items-center space-x-4">
@@ -96,8 +106,8 @@ const Profile = () => {
             <div className="grid md:grid-cols-2 gap-6">
               {/* Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Full Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -111,22 +121,22 @@ const Profile = () => {
 
               {/* Email (Read Only) */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Email Address <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="email"
                   value={user?.email || ''}
                   disabled
-                  className="input-field bg-gray-50 cursor-not-allowed"
+                  className="input-field bg-gray-50 dark:bg-gray-700 cursor-not-allowed"
                 />
-                <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Email cannot be changed</p>
               </div>
 
               {/* Phone */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Phone Number <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="tel"
@@ -140,7 +150,7 @@ const Profile = () => {
 
               {/* Street */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Street Address
                 </label>
                 <input
@@ -155,7 +165,7 @@ const Profile = () => {
 
               {/* City */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   City
                 </label>
                 <input
@@ -170,7 +180,7 @@ const Profile = () => {
 
               {/* State */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   State
                 </label>
                 <input
@@ -185,7 +195,7 @@ const Profile = () => {
 
               {/* Pincode */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Pincode
                 </label>
                 <input

@@ -160,20 +160,20 @@ const MakeDonation = () => {
     return (
       <UserLayout>
         <div className="max-w-lg mx-auto text-center py-12 animate-fadeIn">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <FiCheckCircle className="text-green-600 text-4xl" />
+          <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+            <FiCheckCircle className="text-green-600 dark:text-green-400 text-4xl" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Thank You!</h2>
-          <p className="text-gray-500 mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Thank You!</h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">
             Your donation of {formatCurrency(successData?.amount || amount)} has been received successfully.
           </p>
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <p className="text-sm text-gray-500 mb-1">Receipt ID</p>
-            <p className="font-mono text-lg font-medium text-gray-900">{successData?.receiptId}</p>
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-6">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Receipt ID</p>
+            <p className="font-mono text-lg font-medium text-gray-900 dark:text-white">{successData?.receiptId}</p>
           </div>
           {mockMode && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-6">
-              <p className="text-sm text-yellow-700">
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-6">
+              <p className="text-sm text-yellow-700 dark:text-yellow-300">
                 🧪 This was a test payment (Mock Mode)
               </p>
             </div>
@@ -205,32 +205,32 @@ const MakeDonation = () => {
     <UserLayout>
       <div className="max-w-2xl mx-auto animate-fadeIn">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FiHeart className="text-primary-600 text-2xl" />
+          <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FiHeart className="text-primary-600 dark:text-primary-400 text-2xl" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Make a Donation</h1>
-          <p className="text-gray-500 mt-2">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Make a Donation</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">
             Your generosity helps us create positive change
           </p>
         </div>
 
         {/* Mock Mode Banner */}
         {!gatewayLoading && mockMode && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 flex items-start space-x-3">
-            <FiAlertCircle className="text-yellow-600 text-xl mt-0.5 flex-shrink-0" />
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6 flex items-start space-x-3">
+            <FiAlertCircle className="text-yellow-600 dark:text-yellow-400 text-xl mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-medium text-yellow-800">Test Mode Active</p>
-              <p className="text-sm text-yellow-700 mt-1">
+              <p className="font-medium text-yellow-800 dark:text-yellow-300">Test Mode Active</p>
+              <p className="text-sm text-yellow-700 dark:text-yellow-400 mt-1">
                 Cashfree is not configured. Payments will be simulated for testing purposes.
               </p>
             </div>
           </div>
         )}
 
-        <div className="bg-white rounded-xl shadow-sm p-6 md:p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 md:p-8">
           {/* Preset Amounts */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               Select Amount
             </label>
             <div className="grid grid-cols-3 gap-3">
@@ -240,8 +240,8 @@ const MakeDonation = () => {
                   onClick={() => setAmount(preset.toString())}
                   className={`py-3 px-4 rounded-lg border-2 font-medium transition-all ${
                     amount === preset.toString()
-                      ? 'border-primary-600 bg-primary-50 text-primary-600'
-                      : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                      ? 'border-primary-600 bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
+                      : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300'
                   }`}
                 >
                   {formatCurrency(preset)}
@@ -252,7 +252,7 @@ const MakeDonation = () => {
 
           {/* Custom Amount */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Or Enter Custom Amount (₹)
             </label>
             <input
@@ -267,7 +267,7 @@ const MakeDonation = () => {
 
           {/* Notes */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Message (Optional)
             </label>
             <textarea
@@ -281,10 +281,10 @@ const MakeDonation = () => {
 
           {/* Summary */}
           {amount && parseInt(amount) > 0 && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">Donation Amount</span>
-                <span className="text-xl font-bold text-gray-900">
+                <span className="text-gray-600 dark:text-gray-300">Donation Amount</span>
+                <span className="text-xl font-bold text-gray-900 dark:text-white">
                   {formatCurrency(parseInt(amount))}
                 </span>
               </div>
@@ -308,14 +308,14 @@ const MakeDonation = () => {
           </button>
 
           {/* Security Note */}
-          <p className="text-center text-sm text-gray-500 mt-4">
+          <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
             🔒 {mockMode ? 'Test mode - no real transactions' : 'Secured by Cashfree. Your payment information is safe.'}
           </p>
         </div>
 
         {/* Info Note */}
-        <div className="mt-6 bg-blue-50 rounded-lg p-4">
-          <p className="text-sm text-blue-700">
+        <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+          <p className="text-sm text-blue-700 dark:text-blue-300">
             <strong>Note:</strong> Your donation attempt will be recorded regardless of payment outcome. 
             You can view all your donation attempts in the "My Donations" section.
           </p>

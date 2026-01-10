@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { 
   FiHome, 
   FiHeart, 
@@ -7,12 +8,15 @@ import {
   FiLogOut, 
   FiMenu, 
   FiX,
-  FiDollarSign 
+  FiDollarSign,
+  FiSun,
+  FiMoon
 } from 'react-icons/fi';
 import { useState } from 'react';
 
 const UserLayout = ({ children }) => {
   const { user, logout } = useAuth();
+  const { darkMode, toggleDarkMode } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -32,7 +36,7 @@ const UserLayout = ({ children }) => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
@@ -43,20 +47,20 @@ const UserLayout = ({ children }) => {
 
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 z-50 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out
+        fixed top-0 left-0 z-50 h-full w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out
         lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-between h-16 px-4 border-b">
+          <div className="flex items-center justify-between h-16 px-4 border-b dark:border-gray-700">
             <Link to="/dashboard" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
                 <FiHeart className="text-white" />
               </div>
-              <span className="text-lg font-bold text-gray-800">NGO Portal</span>
+              <span className="text-lg font-bold text-gray-800 dark:text-white">NGO Portal</span>
             </Link>
             <button 
-              className="lg:hidden text-gray-500 hover:text-gray-700"
+              className="lg:hidden text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
               onClick={() => setSidebarOpen(false)}
             >
               <FiX size={24} />
@@ -73,8 +77,8 @@ const UserLayout = ({ children }) => {
                 className={`
                   flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors
                   ${isActive(item.href) 
-                    ? 'bg-primary-50 text-primary-600' 
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' 
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                   }
                 `}
               >
@@ -85,21 +89,21 @@ const UserLayout = ({ children }) => {
           </nav>
 
           {/* User info & logout */}
-          <div className="p-4 border-t">
+          <div className="p-4 border-t dark:border-gray-700">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-                <span className="text-primary-600 font-semibold">
+              <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+                <span className="text-primary-600 dark:text-primary-400 font-semibold">
                   {user?.name?.charAt(0).toUpperCase()}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
-                <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user?.name}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+              className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
             >
               <FiLogOut size={18} />
               <span>Logout</span>
@@ -111,16 +115,24 @@ const UserLayout = ({ children }) => {
       {/* Main content */}
       <div className="lg:ml-64">
         {/* Top bar */}
-        <header className="h-16 bg-white shadow-sm flex items-center justify-between px-4 lg:px-8">
+        <header className="h-16 bg-white dark:bg-gray-800 shadow-sm flex items-center justify-between px-4 lg:px-8 transition-colors duration-300">
           <button 
-            className="lg:hidden text-gray-500 hover:text-gray-700"
+            className="lg:hidden text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             onClick={() => setSidebarOpen(true)}
           >
             <FiMenu size={24} />
           </button>
           <div className="flex-1" />
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-500">Welcome, {user?.name}</span>
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {darkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
+            </button>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Welcome, {user?.name}</span>
           </div>
         </header>
 

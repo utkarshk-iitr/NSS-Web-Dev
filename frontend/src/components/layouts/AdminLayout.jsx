@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { 
   FiHome, 
   FiUsers, 
@@ -7,12 +8,15 @@ import {
   FiLogOut, 
   FiMenu, 
   FiX,
-  FiShield
+  FiShield,
+  FiSun,
+  FiMoon
 } from 'react-icons/fi';
 import { useState } from 'react';
 
 const AdminLayout = ({ children }) => {
   const { user, logout } = useAuth();
+  const { darkMode, toggleDarkMode } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -31,7 +35,7 @@ const AdminLayout = ({ children }) => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
@@ -42,7 +46,7 @@ const AdminLayout = ({ children }) => {
 
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 z-50 h-full w-64 bg-gray-900 shadow-lg transform transition-transform duration-300 ease-in-out
+        fixed top-0 left-0 z-50 h-full w-64 bg-gray-900 dark:bg-gray-950 shadow-lg transform transition-transform duration-300 ease-in-out
         lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="flex flex-col h-full">
@@ -110,16 +114,24 @@ const AdminLayout = ({ children }) => {
       {/* Main content */}
       <div className="lg:ml-64">
         {/* Top bar */}
-        <header className="h-16 bg-white shadow-sm flex items-center justify-between px-4 lg:px-8">
+        <header className="h-16 bg-white dark:bg-gray-800 shadow-sm flex items-center justify-between px-4 lg:px-8 transition-colors duration-300">
           <button 
-            className="lg:hidden text-gray-500 hover:text-gray-700"
+            className="lg:hidden text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             onClick={() => setSidebarOpen(true)}
           >
             <FiMenu size={24} />
           </button>
           <div className="flex-1" />
           <div className="flex items-center space-x-4">
-            <span className="px-3 py-1 bg-primary-100 text-primary-700 text-sm font-medium rounded-full">
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {darkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
+            </button>
+            <span className="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-sm font-medium rounded-full">
               Admin
             </span>
           </div>
