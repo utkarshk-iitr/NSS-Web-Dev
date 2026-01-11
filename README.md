@@ -2,21 +2,6 @@
 
 A full-stack MERN (MongoDB, Express.js, React, Node.js) application for managing NGO user registrations and donations with integrated Cashfree payment gateway support.
 
-## Table of Contents
-
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [Prerequisites](#-prerequisites)
-- [Installation](#-installation)
-- [Configuration](#-configuration)
-- [Running the Application](#-running-the-application)
-- [API Documentation](#-api-documentation)
-- [Database Schema](#-database-schema)
-- [Payment Integration](#-payment-integration)
-- [Demo Video](#-demo)
-- [Contributing](#-contributing)
-
 ## Features
 
 ### Dark Mode
@@ -381,9 +366,5 @@ curl -X POST http://localhost:5000/api/auth/create-admin \
 
 ### Dark Mode
 Toggle dark mode using the sun/moon icon in the header. Theme preference is saved to localStorage.
-
-## 👨Author
-
-**Utkarsh Kumar**
 
 ---
