@@ -104,11 +104,23 @@ const Users = () => {
 
   const handleExport = async () => {
     try {
-      const response = await api.get('/admin/export/users', { params: filters });
-      exportToCSV(response.data.data, 'users_export');
-      toast.success('Export successful!');
+      // Only pass non-empty filter values
+      const exportParams = {};
+      if (filters.isActive) exportParams.isActive = filters.isActive;
+      if (filters.startDate) exportParams.startDate = filters.startDate;
+      if (filters.endDate) exportParams.endDate = filters.endDate;
+      
+      const response = await api.get('/admin/export/users', { params: exportParams });
+      
+      if (response.data.data && response.data.data.length > 0) {
+        exportToCSV(response.data.data, 'users_export');
+        toast.success(`Exported ${response.data.count} users successfully!`);
+      } else {
+        toast.error('No users to export');
+      }
     } catch (error) {
-      toast.error('Export failed');
+      console.error('Export error:', error);
+      toast.error(error.response?.data?.message || 'Export failed');
     }
   };
 

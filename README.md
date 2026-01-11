@@ -1,12 +1,8 @@
 # NGO Registration and Donation Management System
 
-A full-stack MERN (MongoDB, Express.js, React, Node.js) application for managing NGO user registrations and donations with integrated payment gateway support.
+A full-stack MERN (MongoDB, Express.js, React, Node.js) application for managing NGO user registrations and donations with integrated Cashfree payment gateway support.
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green.svg)
-![React](https://img.shields.io/badge/react-18.2.0-blue.svg)
-
-## 📋 Table of Contents
+## Table of Contents
 
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
@@ -18,136 +14,175 @@ A full-stack MERN (MongoDB, Express.js, React, Node.js) application for managing
 - [API Documentation](#-api-documentation)
 - [Database Schema](#-database-schema)
 - [Payment Integration](#-payment-integration)
-- [Screenshots](#-screenshots)
+- [Demo Video](#-demo)
 - [Contributing](#-contributing)
-- [License](#-license)
 
-## ✨ Features
+## Features
+
+### Dark Mode
+- System-wide dark/light theme toggle
+- Persisted theme preference in localStorage
+- Respects system preference on first visit
+- Smooth transition animations
 
 ### Authentication
 - Common login & registration page for users and admins
 - Role-based access control (User/Admin)
-- JWT-based authentication
+- JWT-based authentication with 7-day expiry
 - Secure password hashing with bcrypt
+- Protected routes with automatic redirect
 
 ### User Features
-- **Dashboard**: View donation statistics and recent activity
-- **Make Donations**: Donate any amount with secure payment processing
-- **Donation History**: View all donation attempts with status tracking
-- **Profile Management**: Update personal and address information
-- **Receipt Download**: Download receipts for successful donations
+- **Dashboard**: View donation statistics, total donated, recent activity
+- **Make Donations**: 
+  - Donate any custom amount (minimum ₹1)
+  - Preset amount buttons (₹100, ₹500, ₹1000, ₹5000)
+  - Secure Cashfree payment integration
+  - Mock mode for testing without real payments
+- **Donation History**: 
+  - View all donation attempts with status tracking
+  - Filter by status (All, Success, Pending, Failed)
+  - Paginated list with detailed information
+- **Profile Management**: 
+  - Update personal information (name, phone)
+  - Update address details (street, city, state, pincode)
+  - Real-time validation with detailed error messages
+- **PDF Receipt Download**: 
+  - Professional PDF receipts for successful donations
+  - Includes donor info, payment details, receipt ID
+  - Branded design with organization logo
 
 ### Admin Features
-- **Dashboard**: View total registrations, donations, and analytics
+- **Dashboard**: 
+  - Total registrations and active users count
+  - Donation statistics with charts (Recharts)
+  - Payment status breakdown (Success/Pending/Failed)
+  - User registration trends
+  - Recent donations list
 - **User Management**: 
-  - View all registered users
-  - Filter by status, date range
+  - View all registered users with pagination
+  - Search by name, email, or phone
+  - Filter by status (Active/Inactive) and date range
+  - View detailed user profile with donation summary
   - Activate/deactivate users
+  - Delete users (with cascade delete of donations)
   - Export user data to CSV
 - **Donation Management**:
-  - View all donation records
-  - Filter by status, date, amount
-  - Track payment status and timestamps
-  - View aggregated donation amounts
-  - Export donation data
+  - View all donation records with pagination
+  - Filter by status, date range, amount range
+  - View detailed donation information
+  - Track payment IDs and timestamps
+  - View aggregated statistics
+  - Export donation data to CSV
 
 ### Data Handling
 - Registration data stored independently of donation completion
 - Donation attempts tracked regardless of payment outcome
 - Clear status tracking: success, pending, failed
-- No fake or forced payment success logic
+- Receipt ID generation for successful payments
+- Webhook support for payment verification
 
 ## 🛠 Tech Stack
 
 ### Backend
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB with Mongoose ODM
-- **Authentication**: JWT (JSON Web Tokens)
-- **Password Hashing**: bcryptjs
-- **Validation**: express-validator
-- **Payment Gateway**: Cashfree (Sandbox/Production)
+| Technology | Purpose |
+|------------|---------|
+| Node.js | Runtime environment |
+| Express.js | Web framework |
+| MongoDB | Database |
+| Mongoose | ODM for MongoDB |
+| JWT | Authentication |
+| bcryptjs | Password hashing |
+| express-validator | Input validation |
+| Axios | HTTP client (for Cashfree API) |
+| crypto | Signature verification |
 
 ### Frontend
-- **Framework**: React 18
-- **Build Tool**: Vite
-- **Routing**: React Router v6
-- **Styling**: Tailwind CSS
-- **HTTP Client**: Axios
-- **Charts**: Recharts
-- **Icons**: React Icons
-- **Notifications**: React Hot Toast
+| Technology | Purpose |
+|------------|---------|
+| React 18 | UI framework |
+| Vite | Build tool & dev server |
+| React Router v6 | Client-side routing |
+| Tailwind CSS | Styling (with dark mode) |
+| Axios | HTTP client |
+| Recharts | Charts & analytics |
+| React Icons | Icon library |
+| React Hot Toast | Notifications |
+| jsPDF | PDF receipt generation |
 
-## 📁 Project Structure
+### Payment Gateway
+| Provider | Mode | Features |
+|----------|------|----------|
+| Cashfree | Sandbox/Production | UPI, Cards, Net Banking, Wallets |
+
+## Project Structure
 
 ```
 NSS-Web-Dev/
 ├── backend/
 │   ├── middleware/
-│   │   └── auth.js              # Authentication middleware
+│   │   └── auth.js                 # JWT authentication & admin middleware
 │   ├── models/
-│   │   ├── User.js              # User schema
-│   │   └── Donation.js          # Donation schema
+│   │   ├── User.js                 # User schema with address
+│   │   └── Donation.js             # Donation schema with payment tracking
 │   ├── routes/
-│   │   ├── auth.js              # Authentication routes
-│   │   ├── user.js              # User routes
-│   │   ├── admin.js             # Admin routes
-│   │   └── donation.js          # Donation & payment routes
-│   ├── .env.example             # Environment variables template
+│   │   ├── auth.js                 # Login, register, admin creation
+│   │   ├── user.js                 # Profile, dashboard, donations
+│   │   ├── admin.js                # User & donation management
+│   │   └── donation.js             # Cashfree payment integration
+│   ├── .env                        # Environment variables
 │   ├── package.json
-│   └── server.js                # Entry point
+│   └── server.js                   # Express server entry point
 │
 ├── frontend/
-│   ├── public/
-│   │   └── favicon.svg
 │   ├── src/
 │   │   ├── components/
 │   │   │   └── layouts/
-│   │   │       ├── UserLayout.jsx
-│   │   │       └── AdminLayout.jsx
+│   │   │       ├── UserLayout.jsx  # User dashboard layout
+│   │   │       └── AdminLayout.jsx # Admin panel layout
 │   │   ├── context/
-│   │   │   └── AuthContext.jsx  # Authentication context
+│   │   │   ├── AuthContext.jsx     # Authentication state
+│   │   │   └── ThemeContext.jsx    # Dark mode state
 │   │   ├── pages/
 │   │   │   ├── admin/
-│   │   │   │   ├── Dashboard.jsx
-│   │   │   │   ├── Users.jsx
-│   │   │   │   └── Donations.jsx
+│   │   │   │   ├── Dashboard.jsx   # Admin analytics
+│   │   │   │   ├── Users.jsx       # User management
+│   │   │   │   └── Donations.jsx   # Donation management
 │   │   │   ├── user/
-│   │   │   │   ├── Dashboard.jsx
-│   │   │   │   ├── Donations.jsx
-│   │   │   │   ├── MakeDonation.jsx
-│   │   │   │   └── Profile.jsx
-│   │   │   ├── LandingPage.jsx
-│   │   │   ├── Login.jsx
-│   │   │   └── Register.jsx
+│   │   │   │   ├── Dashboard.jsx   # User overview
+│   │   │   │   ├── Donations.jsx   # Donation history
+│   │   │   │   ├── MakeDonation.jsx# Payment form
+│   │   │   │   └── Profile.jsx     # Profile settings
+│   │   │   ├── LandingPage.jsx     # Public homepage
+│   │   │   ├── Login.jsx           # Authentication
+│   │   │   └── Register.jsx        # User registration
 │   │   ├── utils/
-│   │   │   ├── api.js           # Axios instance
-│   │   │   └── helpers.js       # Utility functions
-│   │   ├── App.jsx
-│   │   ├── index.css
-│   │   └── main.jsx
+│   │   │   ├── api.js              # Axios instance with interceptors
+│   │   │   └── helpers.js          # Formatting & utility functions
+│   │   ├── App.jsx                 # Route configuration
+│   │   ├── index.css               # Tailwind & global styles
+│   │   └── main.jsx                # React entry point
 │   ├── index.html
 │   ├── package.json
-│   ├── postcss.config.js
-│   ├── tailwind.config.js
+│   ├── tailwind.config.js          # Tailwind with dark mode
 │   └── vite.config.js
 │
 └── README.md
 ```
 
-## 📋 Prerequisites
+## Prerequisites
 
-- Node.js (v18 or higher)
-- MongoDB (local installation or MongoDB Atlas)
-- npm or yarn
-- Cashfree account (for payment integration) - Optional for testing with mock mode
+- **Node.js** v18 or higher
+- **MongoDB** (local or MongoDB Atlas cloud)
+- **npm** or **yarn**
+- **Cashfree Account** (optional - mock mode available for testing)
 
-## 🚀 Installation
+## Installation
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/NSS-Web-Dev.git
+git clone https://github.com/utkarshk-iitr/NSS-Web-Dev.git
 cd NSS-Web-Dev
 ```
 
@@ -165,25 +200,18 @@ cd ../frontend
 npm install
 ```
 
-## ⚙️ Configuration
+## Configuration
 
-### Backend Configuration
+### Backend Environment Variables
 
-1. Navigate to the backend directory
-2. Copy `.env.example` to `.env`:
-
-```bash
-cp .env.example .env
-```
-
-3. Update the `.env` file with your configuration:
+Create a `.env` file in the `backend` directory:
 
 ```env
 # MongoDB Connection
-MONGODB_URI=mongodb://localhost:27017/ngo_donation_db
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/ngo_donation_db?retryWrites=true&w=majority
 
 # JWT Secret (use a strong random string)
-JWT_SECRET=your_super_secret_jwt_key_here
+JWT_SECRET=your_super_secret_jwt_key_here_make_it_long_and_random
 
 # Server Port
 PORT=5000
@@ -192,117 +220,104 @@ PORT=5000
 CASHFREE_APP_ID=your_cashfree_app_id
 CASHFREE_SECRET_KEY=your_cashfree_secret_key
 
-# Frontend URL (for CORS and redirects)
+# URLs
 FRONTEND_URL=http://localhost:3000
-
-# Backend URL (for webhooks)
 BACKEND_URL=http://localhost:5000
 ```
 
 ### Getting Cashfree Credentials
 
 1. Sign up at [Cashfree Merchant Dashboard](https://merchant.cashfree.com/)
-2. Go to Developers → API Keys
-3. Copy the Test App ID and Test Secret Key to your `.env` file
-4. **Note**: You can skip this step and use Mock Mode for testing without real payment credentials
+2. Complete KYC verification (for production)
+3. Go to **Developers → API Keys**
+4. Copy the **Test App ID** and **Test Secret Key**
+5. Add them to your `.env` file
 
-## 🏃 Running the Application
+## Running the Application
 
 ### Development Mode
+
+You need **two terminals** running simultaneously:
 
 **Terminal 1 - Backend:**
 ```bash
 cd backend
 npm run dev
 ```
-Backend will run on `http://localhost:5000`
+Backend runs on `http://localhost:5000`
 
 **Terminal 2 - Frontend:**
 ```bash
 cd frontend
 npm run dev
 ```
-Frontend will run on `http://localhost:3000`
+Frontend runs on `http://localhost:3000`
 
-### Production Mode
-
-**Backend:**
-```bash
-cd backend
-npm start
-```
-
-**Frontend:**
-```bash
-cd frontend
-npm run build
-npm run preview
-```
-
-## 📚 API Documentation
+## API Documentation
 
 ### Authentication Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | Register new user |
-| POST | `/api/auth/login` | Login user/admin |
-| GET | `/api/auth/me` | Get current user |
-| POST | `/api/auth/create-admin` | Create admin (with secret) |
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/auth/register` | Register new user | Public |
+| POST | `/api/auth/login` | Login user/admin | Public |
+| GET | `/api/auth/me` | Get current user | Required |
+| POST | `/api/auth/create-admin` | Create admin account | Secret Key |
 
 ### User Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/user/profile` | Get user profile |
-| PUT | `/api/user/profile` | Update profile |
-| GET | `/api/user/donations` | Get donation history |
-| GET | `/api/user/dashboard` | Get dashboard data |
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/user/profile` | Get user profile | User |
+| PUT | `/api/user/profile` | Update profile | User |
+| GET | `/api/user/donations` | Get donation history | User |
+| GET | `/api/user/dashboard` | Get dashboard stats | User |
 
 ### Admin Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/admin/dashboard` | Get admin dashboard stats |
-| GET | `/api/admin/users` | Get all users (with filters) |
-| GET | `/api/admin/users/:id` | Get user details |
-| PUT | `/api/admin/users/:id/status` | Toggle user status |
-| GET | `/api/admin/donations` | Get all donations |
-| GET | `/api/admin/export/users` | Export users data |
-| GET | `/api/admin/export/donations` | Export donations data |
-| GET | `/api/admin/analytics` | Get analytics data |
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/admin/dashboard` | Get admin statistics | Admin |
+| GET | `/api/admin/users` | Get users (paginated) | Admin |
+| GET | `/api/admin/users/:id` | Get user details | Admin |
+| PUT | `/api/admin/users/:id/status` | Toggle user active status | Admin |
+| DELETE | `/api/admin/users/:id` | Delete user & donations | Admin |
+| GET | `/api/admin/donations` | Get all donations | Admin |
+| GET | `/api/admin/donations/:id` | Get donation details | Admin |
+| GET | `/api/admin/export/users` | Export users to CSV | Admin |
+| GET | `/api/admin/export/donations` | Export donations to CSV | Admin |
 
 ### Donation Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/donation/config` | Get payment gateway config |
-| POST | `/api/donation/create-order` | Create Cashfree order |
-| POST | `/api/donation/verify-payment` | Verify payment |
-| POST | `/api/donation/payment-failed` | Record failed payment |
-| POST | `/api/donation/webhook` | Cashfree webhook endpoint |
-| GET | `/api/donation/receipt/:id` | Get donation receipt |
-| GET | `/api/donation/check-status/:orderId` | Check order payment status |
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/donation/config` | Get payment config | User |
+| POST | `/api/donation/create-order` | Create Cashfree order | User |
+| POST | `/api/donation/verify-payment` | Verify payment | User |
+| POST | `/api/donation/payment-failed` | Record failed payment | User |
+| POST | `/api/donation/webhook` | Cashfree webhook | Public |
+| GET | `/api/donation/receipt/:id` | Get donation receipt | User |
+| GET | `/api/donation/check-status/:orderId` | Check payment status | User |
 
-## 🗄 Database Schema
+## Database Schema
 
 ### User Schema
 ```javascript
 {
-  name: String,           // Required
-  email: String,          // Required, Unique
-  password: String,       // Required, Hashed
-  phone: String,
+  name: String,              // Required, trimmed
+  email: String,             // Required, unique, lowercase
+  password: String,          // Required, hashed with bcrypt
+  phone: String,             // Optional
   address: {
     street: String,
     city: String,
     state: String,
     pincode: String,
-    country: String
+    country: String          // Default: 'India'
   },
-  role: String,           // 'user' or 'admin'
-  isActive: Boolean,
-  registeredAt: Date,
+  role: String,              // 'user' or 'admin'
+  isActive: Boolean,         // Default: true
+  registeredAt: Date,        // Auto-set on creation
   createdAt: Date,
   updatedAt: Date
 }
@@ -311,87 +326,64 @@ npm run preview
 ### Donation Schema
 ```javascript
 {
-  user: ObjectId,         // Reference to User
-  amount: Number,         // Required
-  currency: String,       // Default: 'INR'
-  status: String,         // 'pending', 'success', 'failed'
-  razorpayOrderId: String,
-  razorpayPaymentId: String,
-  razorpaySignature: String,
-  attemptedAt: Date,
-  completedAt: Date,
-  failureReason: String,
-  notes: String,
-  receiptId: String,      // Generated on success
+  user: ObjectId,            // Reference to User
+  amount: Number,            // Required, min: 1
+  currency: String,          // Default: 'INR'
+  status: String,            // 'pending', 'success', 'failed'
+  razorpayOrderId: String,   // Cashfree order ID
+  razorpayPaymentId: String, // Cashfree payment ID
+  razorpaySignature: String, // Payment signature
+  attemptedAt: Date,         // When payment was initiated
+  completedAt: Date,         // When payment was completed
+  failureReason: String,     // Error message if failed
+  notes: String,             // Optional donor notes
+  receiptId: String,         // Generated on success (RCPT_xxx)
   createdAt: Date,
   updatedAt: Date
 }
 ```
 
-## 💳 Payment Integration
+## Payment Integration
 
-This project uses **Razorpay** payment gateway in sandbox/test mode.
-
-### Test Card Details (Sandbox)
-- **Card Number**: 4111 1111 1111 1111
-- **Expiry**: Any future date
-- **CVV**: Any 3 digits
-- **OTP**: 123456
+This project uses **Cashfree** payment gateway with sandbox mode for testing.
 
 ### Payment Flow
-1. User enters donation amount
-2. Backend creates Razorpay order
-3. Donation record created with 'pending' status
-4. Razorpay checkout opens
-5. User completes payment
-6. Backend verifies payment signature
-7. Donation status updated to 'success' or 'failed'
+```
+1. User enters amount → 2. Create Order API → 3. Cashfree Checkout Opens
+                                                       ↓
+4. User completes payment ← 5. Verify Payment ← 6. Redirect to App
+                                                       ↓
+7. Update donation status → 8. Generate Receipt ID → 9. Show Success
+```
 
-## 📸 Screenshots
+## Default Credentials
 
-### Landing Page
-Modern, responsive landing page with call-to-action
-
-### User Dashboard
-Overview of donation statistics and recent activity
-
-### Admin Dashboard
-Comprehensive analytics with charts and statistics
-
-### Make Donation
-Clean donation form with preset amounts and Razorpay integration
-
-## 🧪 Creating Test Admin
-
-To create an admin user, make a POST request:
+### Creating Admin User
 
 ```bash
 curl -X POST http://localhost:5000/api/auth/create-admin \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Admin User",
-    "email": "admin@example.com",
+    "email": "admin@ngo.com",
     "password": "admin123",
     "adminSecret": "ADMIN_SECRET_KEY"
   }'
 ```
 
-## 🤝 Contributing
+### Test Users
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@ngo.com | admin123 |
+| User | demo@demo.com | demo123 |
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+## Theme Customization
 
-## 📄 License
+### Dark Mode
+Toggle dark mode using the sun/moon icon in the header. Theme preference is saved to localStorage.
 
-This project is licensed under the MIT License.
-
-## 👨‍💻 Author
+## 👨Author
 
 **Utkarsh Kumar**
 
 ---
-
-Made with ❤️ for NSS Web Development

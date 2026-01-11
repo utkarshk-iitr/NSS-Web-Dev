@@ -44,28 +44,42 @@ export const getStatusColor = (status) => {
 
 // Convert data to CSV
 export const exportToCSV = (data, filename) => {
-  if (!data || data.length === 0) return;
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    console.warn('No data to export');
+    return false;
+  }
 
-  const headers = Object.keys(data[0]);
-  const csvContent = [
-    headers.join(','),
-    ...data.map(row => 
-      headers.map(header => {
-        let cell = row[header] ?? '';
-        // Escape commas and quotes
-        if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))) {
-          cell = `"${cell.replace(/"/g, '""')}"`;
-        }
-        return cell;
-      }).join(',')
-    )
-  ].join('\n');
+  try {
+    const headers = Object.keys(data[0]);
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row => 
+        headers.map(header => {
+          let cell = row[header] ?? '';
+          // Convert to string
+          cell = String(cell);
+          // Escape commas and quotes
+          if (cell.includes(',') || cell.includes('"') || cell.includes('\n')) {
+            cell = `"${cell.replace(/"/g, '""')}"`;
+          }
+          return cell;
+        }).join(',')
+      )
+    ].join('\n');
 
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
-  link.click();
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+    return true;
+  } catch (error) {
+    console.error('CSV export error:', error);
+    return false;
+  }
 };
 
 // Truncate text
